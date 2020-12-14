@@ -1,0 +1,48 @@
+- hosts: webserver
+  tasks:
+  - name: Installing httpd package
+    package:
+      name: httpd
+      state: present
+
+  - name: Install php software
+    package: 
+      name: "php"
+      state: present
+
+  - name: Starting services
+    service:
+      name: "httpd"
+      state: started
+      enabled: yes
+
+  - name: Creating webpage
+    copy:
+      dest: "/var/www/html/web.php"
+      src: "/ws2/web.php"
+
+  - name: Enabling firewall
+    firewalld:
+      port: "80/tcp"
+      permanent: yes
+      state: enabled
+      immediate: yes
+
+- hosts: loadbalancer
+  tasks: 
+  - name: installing haproxy
+    package:
+      name: "haproxy"
+      state: present
+
+  - name: configure haproxy
+    template:
+      dest: "/etc/haproxy/haproxy.cfg"
+      src: "/ws2/haproxy.cfg.j2"
+
+  - name: start haproxy
+    service:
+      name: "haproxy"
+      state: started
+
+  
